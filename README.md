@@ -5,6 +5,12 @@ Experimenting with [1000x Faster Financial Transaction Database](https://tigerbe
 ## Results
 
 ```
+$ ./tigerbeetle version
+TigerBeetle version 0.16.38+2371483
+
+$ go version
+go version go1.24.2 darwin/arm64
+
 goos: darwin
 goarch: arm64
 pkg: kizzx2.com/tigerbeetle-benchmarks
@@ -13,26 +19,26 @@ cpu: Apple M4 Pro
 
 | Benchmark Name        | Time (ns/op) |
 |-|-|
-|BenchmarkBasicTigerBeetle | 26765000 ns/op|
-|BenchmarkBasicRedis | 998173 ns/op|
-|BenchmarkBasicPostgres | 1663902 ns/op|
-|BenchmarkTwoPhaseTigerBeetle | 77374708 ns/op|
-|BenchmarkTwoPhaseRedis | 973298 ns/op|
-|BenchmarkTwoPhasePostgres | 2768751 ns/op|
-|BenchmarkBasicBatchTigerBeetle | 62640641 ns/op|
-|BenchmarkBasicBatchRedis | 3160213 ns/op|
-|BenchmarkBasicBatchPostgres | 490459944 ns/op|
+| BenchmarkBasicTigerBeetle | 24362892 ns/op |
+| BenchmarkBasicRedis | 173072 ns/op |
+| BenchmarkBasicPostgres | 781365 ns/op |
+| BenchmarkTwoPhaseTigerBeetle | 60988901 ns/op |
+| BenchmarkTwoPhaseRedis | 171658 ns/op |
+| BenchmarkTwoPhasePostgres | 1533958 ns/op |
+| BenchmarkBasicBatchTigerBeetle | 27807630 ns/op |
+| BenchmarkBasicBatchRedis | 1362045 ns/op |
+| BenchmarkBasicBatchPostgres | 86402994 ns/op |
 
 ```
 PASS
-ok      kizzx2.com/tigerbeetle-benchmarks       208.601s
+ok      kizzx2.com/tigerbeetle-benchmarks       204.673s
 ```
 
 ## TL;DR
 
-- TigerBeetle is 26x slower than Redis and 16x slower than Postgres for basic transactions.
-- TigerBeetle is 79x slower than Redis and 28x slower than Postgres for two-phase transactions.
-- TigerBeetle is 20x slower than Redis and 10x faster than Postgres for batches of 1000 transactions.
+- TigerBeetle is :red_circle: 140x slower than Redis and :red_circle: 31x slower than Postgres for basic transactions.
+- TigerBeetle is :red_circle: 355x slower than Redis and :red_circle: 40x slower than Postgres for two-phase transactions.
+- TigerBeetle is :red_circle: 20x slower than Redis and :large_blue_circle: 3x faster than Postgres for batches of 1000 transactions.
 
 ## Methodology
 
