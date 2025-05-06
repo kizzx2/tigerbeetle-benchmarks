@@ -20,7 +20,7 @@ cpu: Apple M4 Pro | AMD Ryzen 7 5800H with Radeon Graphics
 | Benchmark Name | Mac M4 ns/op | Linux AMD ns/op | Mac M4 TigerBeetle faster by | Linux AMD TigerBeetle faster by |
 |-|-|-|-|-|
 | BenchmarkBasicTigerBeetle | 24362892 | 3763695 | - | - |
-| BenchmarkBasicRedis | 173072 | 537230 | 🔴 -140x | 🔴 -600x |
+| BenchmarkBasicRedis | 173072 | 537230 | 🔴 -140x | 🔴 -6x |
 | BenchmarkBasicPostgres | 781365 | 2067554 | 🔴 -30x | 🔴-1x |
 | BenchmarkTwoPhaseTigerBeetle | 60988901 | 16520356 | - | - |
 | BenchmarkTwoPhaseRedis | 171658 | 560849 | 🔴 -354x | 🔴 -28x |
