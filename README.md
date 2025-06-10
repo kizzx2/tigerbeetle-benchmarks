@@ -28,6 +28,9 @@ cpu: Apple M4 Pro | AMD Ryzen 7 5800H with Radeon Graphics
 | BenchmarkBasicBatchTigerBeetle | 27807630 | 30229617 | - | - |
 | BenchmarkBasicBatchRedis | 1362045 | 1980634 | 🔴 -20x | 🔴-14x |
 | BenchmarkBasicBatchPostgres | 86402994 | 308697749 | 🔵 2x | 🔵10x |
+| BenchmarkBasicTigerBeetleParallel | 2946523 | 230546 | - | - |
+| BenchmarkBasicRedisParallel | 38348 | 30556 | 🔴-76x | 🔴-7x |
+| BenchmarkBasicPostgresParallel | 592111 | 1435170 | 🔴-4x | 🔵6x |
 
 ```
 PASS
@@ -38,6 +41,8 @@ ok      kizzx2.com/tigerbeetle-benchmarks       204.673s
 
 TigerBeetle is about 1 - 2 order of magnitudes slower than Redis / Postgres except for when batching 1000 transactions each batch, where it starts to catch up.
 
+There is some speed up [as suggested](https://github.com/kizzx2/tigerbeetle-benchmarks/issues/1) by running in parallel, but for the most part one would colloquially say that TigerBeetle is still drastically slower. Perhaps there are some highly specialized test case where this can differ which is not covered here.
+
 ## Methodology
 
 The first 2 scenarios are based on the [samples code from the tigerbeetle-go](https://github.com/tigerbeetle/tigerbeetle-go/tree/main/samples) client library.
@@ -45,6 +50,8 @@ The first 2 scenarios are based on the [samples code from the tigerbeetle-go](ht
 The batch example was added based on the Basic example because it seemed to be losing too bad.
 
 AMD benchmark was added because it was mentioned that TigerBeetle performs significantly worse on Mac than on Linux. I could confirm that on my particular Linux set up, TigerBeetle was just 100% slower than Postgres for non batch use case.
+
+Parallel benchmark was added as suggested that it would theoretically lead to being able to witness the 1000x performance difference.
 
 ## How to Run
 

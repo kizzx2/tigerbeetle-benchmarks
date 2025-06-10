@@ -14,7 +14,8 @@ import (
 	. "github.com/tigerbeetle/tigerbeetle-go/pkg/types"
 )
 
-func assert(a, b interface{}, field string) {
+func assert(tb testing.TB, a, b interface{}, field string) {
+	tb.Helper()
 	if !reflect.DeepEqual(a, b) {
 		log.Fatalf("Expected %s to be [%+v (%T)], got: [%+v (%T)]", field, b, b, a, a)
 	}
@@ -80,15 +81,15 @@ func BenchmarkBasicTigerBeetle(b *testing.B) {
 		if err != nil {
 			log.Fatalf("Could not fetch accounts: %s", err)
 		}
-		assert(len(accounts), 2, "accounts")
+		assert(b, len(accounts), 2, "accounts")
 
 		for _, account := range accounts {
 			if account.ID == ToUint128(accountID1) {
-				assert(account.DebitsPosted, ToUint128(tigerBeetleTotalTransferred), "account 1 debits")
-				assert(account.CreditsPosted, ToUint128(0), "account 1 credits")
+				assert(b, account.DebitsPosted, ToUint128(tigerBeetleTotalTransferred), "account 1 debits")
+				assert(b, account.CreditsPosted, ToUint128(0), "account 1 credits")
 			} else if account.ID == ToUint128(accountID2) {
-				assert(account.DebitsPosted, ToUint128(0), "account 2 debits")
-				assert(account.CreditsPosted, ToUint128(tigerBeetleTotalTransferred), "account 2 credits")
+				assert(b, account.DebitsPosted, ToUint128(0), "account 2 debits")
+				assert(b, account.CreditsPosted, ToUint128(tigerBeetleTotalTransferred), "account 2 credits")
 			} else {
 				log.Fatalf("Unexpected account")
 			}
@@ -138,8 +139,8 @@ func BenchmarkBasicRedis(b *testing.B) {
 		val1, _ := strconv.ParseInt(val1Str, 10, 64)
 		val2, _ := strconv.ParseInt(val2Str, 10, 64)
 
-		assert(val1, -redisTotalTransferred, "redis account 1 balance")
-		assert(val2, redisTotalTransferred, "redis account 2 balance")
+		assert(b, val1, -redisTotalTransferred, "redis account 1 balance")
+		assert(b, val2, redisTotalTransferred, "redis account 2 balance")
 	}
 }
 
@@ -207,8 +208,8 @@ func BenchmarkBasicPostgres(b *testing.B) {
 			log.Fatalf("Failed to query account 2 balance: %v", err)
 		}
 
-		assert(bal1, -postgresTotalTransferred, "postgres account 1 balance")
-		assert(bal2, postgresTotalTransferred, "postgres account 2 balance")
+		assert(b, bal1, -postgresTotalTransferred, "postgres account 1 balance")
+		assert(b, bal2, postgresTotalTransferred, "postgres account 2 balance")
 	}
 }
 
@@ -275,19 +276,19 @@ func BenchmarkTwoPhaseTigerBeetle(b *testing.B) {
 		if err != nil {
 			log.Fatalf("Could not fetch accounts: %s", err)
 		}
-		assert(len(accounts), 2, "accounts")
+		assert(b, len(accounts), 2, "accounts")
 
 		for _, account := range accounts {
 			if account.ID == ToUint128(accountID1) {
-				assert(account.DebitsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 1 debits, before posted")
-				assert(account.CreditsPosted, ToUint128(0), "account 1 credits, before posted")
-				assert(account.DebitsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 1 debits pending, before posted")
-				assert(account.CreditsPending, ToUint128(0), "account 1 credits pending, before posted")
+				assert(b, account.DebitsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 1 debits, before posted")
+				assert(b, account.CreditsPosted, ToUint128(0), "account 1 credits, before posted")
+				assert(b, account.DebitsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 1 debits pending, before posted")
+				assert(b, account.CreditsPending, ToUint128(0), "account 1 credits pending, before posted")
 			} else if account.ID == ToUint128(accountID2) {
-				assert(account.DebitsPosted, ToUint128(0), "account 2 debits, before posted")
-				assert(account.CreditsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 2 credits, before posted")
-				assert(account.DebitsPending, ToUint128(0), "account 2 debits pending, before posted")
-				assert(account.CreditsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 2 credits pending, before posted")
+				assert(b, account.DebitsPosted, ToUint128(0), "account 2 debits, before posted")
+				assert(b, account.CreditsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 2 credits, before posted")
+				assert(b, account.DebitsPending, ToUint128(0), "account 2 debits pending, before posted")
+				assert(b, account.CreditsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 2 credits pending, before posted")
 			} else {
 				log.Fatalf("Unexpected account: %s", account.ID)
 			}
@@ -322,15 +323,15 @@ func BenchmarkTwoPhaseTigerBeetle(b *testing.B) {
 		if err != nil {
 			log.Fatalf("Error looking up transfers: %s", err)
 		}
-		assert(len(transfers), 2, "transfers")
+		assert(b, len(transfers), 2, "transfers")
 
 		for _, transfer := range transfers {
 			if transfer.ID == ToUint128(pendingID) {
-				assert(transfer.TransferFlags().Pending, true, "transfer 1 pending")
-				assert(transfer.TransferFlags().PostPendingTransfer, false, "transfer 1 post_pending_transfer")
+				assert(b, transfer.TransferFlags().Pending, true, "transfer 1 pending")
+				assert(b, transfer.TransferFlags().PostPendingTransfer, false, "transfer 1 post_pending_transfer")
 			} else if transfer.ID == ToUint128(postID) {
-				assert(transfer.TransferFlags().Pending, false, "transfer 2 pending")
-				assert(transfer.TransferFlags().PostPendingTransfer, true, "transfer 2 post_pending_transfer")
+				assert(b, transfer.TransferFlags().Pending, false, "transfer 2 pending")
+				assert(b, transfer.TransferFlags().PostPendingTransfer, true, "transfer 2 post_pending_transfer")
 			} else {
 				log.Fatalf("Unknown transfer: %s", transfer.ID)
 			}
@@ -340,19 +341,19 @@ func BenchmarkTwoPhaseTigerBeetle(b *testing.B) {
 		if err != nil {
 			log.Fatalf("Could not fetch accounts: %s", err)
 		}
-		assert(len(accounts), 2, "accounts")
+		assert(b, len(accounts), 2, "accounts")
 
 		for _, account := range accounts {
 			if account.ID == ToUint128(accountID1) {
-				assert(account.DebitsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 1 debits")
-				assert(account.CreditsPosted, ToUint128(0), "account 1 credits")
-				assert(account.DebitsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 1 debits pending")
-				assert(account.CreditsPending, ToUint128(0), "account 1 credits pending")
+				assert(b, account.DebitsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 1 debits")
+				assert(b, account.CreditsPosted, ToUint128(0), "account 1 credits")
+				assert(b, account.DebitsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 1 debits pending")
+				assert(b, account.CreditsPending, ToUint128(0), "account 1 credits pending")
 			} else if account.ID == ToUint128(accountID2) {
-				assert(account.DebitsPosted, ToUint128(0), "account 2 debits")
-				assert(account.CreditsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 2 credits")
-				assert(account.DebitsPending, ToUint128(0), "account 2 debits pending")
-				assert(account.CreditsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 2 credits pending")
+				assert(b, account.DebitsPosted, ToUint128(0), "account 2 debits")
+				assert(b, account.CreditsPosted, ToUint128(tigerBeetleTotalTransferredPosted), "account 2 credits")
+				assert(b, account.DebitsPending, ToUint128(0), "account 2 debits pending")
+				assert(b, account.CreditsPending, ToUint128(tigerBeetleTotalTransferredPending), "account 2 credits pending")
 			} else {
 				log.Fatalf("Unexpected account: %s", account.ID)
 			}
@@ -427,15 +428,15 @@ func BenchmarkTwoPhaseRedis(b *testing.B) {
             return v
         }
 
-        assert(parseInt(0), redisTotalTransferredPending, "redis account 3 pending debits")
-        assert(parseInt(1), int64(0), "redis account 3 pending credits")
-        assert(parseInt(2), redisTotalTransferredPosted, "redis account 3 posted debits")
-        assert(parseInt(3), int64(0), "redis account 3 posted credits")
+        assert(b, parseInt(0), redisTotalTransferredPending, "redis account 3 pending debits")
+        assert(b, parseInt(1), int64(0), "redis account 3 pending credits")
+        assert(b, parseInt(2), redisTotalTransferredPosted, "redis account 3 posted debits")
+        assert(b, parseInt(3), int64(0), "redis account 3 posted credits")
 
-        assert(parseInt(4), int64(0), "redis account 4 pending debits")
-        assert(parseInt(5), redisTotalTransferredPending, "redis account 4 pending credits")
-        assert(parseInt(6), int64(0), "redis account 4 posted debits")
-        assert(parseInt(7), redisTotalTransferredPosted, "redis account 4 posted credits")
+        assert(b, parseInt(4), int64(0), "redis account 4 pending debits")
+        assert(b, parseInt(5), redisTotalTransferredPending, "redis account 4 pending credits")
+        assert(b, parseInt(6), int64(0), "redis account 4 posted debits")
+        assert(b, parseInt(7), redisTotalTransferredPosted, "redis account 4 posted credits")
     }
 }
 
@@ -527,15 +528,15 @@ func BenchmarkTwoPhasePostgres(b *testing.B) {
             log.Fatalf("Failed to query account 4 balances: %v", err)
         }
 
-        assert(pd3, postgresTotalTransferredPending, "postgres account 3 pending debits")
-        assert(pc3, int64(0), "postgres account 3 pending credits")
-        assert(psd3, postgresTotalTransferredPosted, "postgres account 3 posted debits")
-        assert(psc3, int64(0), "postgres account 3 posted credits")
+        assert(b, pd3, postgresTotalTransferredPending, "postgres account 3 pending debits")
+        assert(b, pc3, int64(0), "postgres account 3 pending credits")
+        assert(b, psd3, postgresTotalTransferredPosted, "postgres account 3 posted debits")
+        assert(b, psc3, int64(0), "postgres account 3 posted credits")
 
-        assert(pd4, int64(0), "postgres account 4 pending debits")
-        assert(pc4, postgresTotalTransferredPending, "postgres account 4 pending credits")
-        assert(psd4, int64(0), "postgres account 4 posted debits")
-        assert(psc4, postgresTotalTransferredPosted, "postgres account 4 posted credits")
+        assert(b, pd4, int64(0), "postgres account 4 pending debits")
+        assert(b, pc4, postgresTotalTransferredPending, "postgres account 4 pending credits")
+        assert(b, psd4, int64(0), "postgres account 4 posted debits")
+        assert(b, psc4, postgresTotalTransferredPosted, "postgres account 4 posted credits")
     }
 }
 
@@ -599,15 +600,15 @@ func BenchmarkBasicBatchTigerBeetle(b *testing.B) {
 		if err != nil {
 			log.Fatalf("Could not fetch accounts: %s", err)
 		}
-		assert(len(accounts), 2, "accounts")
+		assert(b, len(accounts), 2, "accounts")
 
 		for _, account := range accounts {
 			if account.ID == ToUint128(accountID1) {
-				assert(account.DebitsPosted, ToUint128(tigerBeetleTotalTransferredBatch), "account 1 debits")
-				assert(account.CreditsPosted, ToUint128(0), "account 1 credits")
+				assert(b, account.DebitsPosted, ToUint128(tigerBeetleTotalTransferredBatch), "account 1 debits")
+				assert(b, account.CreditsPosted, ToUint128(0), "account 1 credits")
 			} else if account.ID == ToUint128(accountID2) {
-				assert(account.DebitsPosted, ToUint128(0), "account 2 debits")
-				assert(account.CreditsPosted, ToUint128(tigerBeetleTotalTransferredBatch), "account 2 credits")
+				assert(b, account.DebitsPosted, ToUint128(0), "account 2 debits")
+				assert(b, account.CreditsPosted, ToUint128(tigerBeetleTotalTransferredBatch), "account 2 credits")
 			} else {
 				log.Fatalf("Unexpected account")
 			}
@@ -660,8 +661,8 @@ func BenchmarkBasicBatchRedis(b *testing.B) {
 		val1, _ := strconv.ParseInt(val1Str, 10, 64)
 		val2, _ := strconv.ParseInt(val2Str, 10, 64)
 
-		assert(val1, -redisTotalTransferredBatch, "redis batch account 5 balance")
-		assert(val2, redisTotalTransferredBatch, "redis batch account 6 balance")
+		assert(b, val1, -redisTotalTransferredBatch, "redis batch account 5 balance")
+		assert(b, val2, redisTotalTransferredBatch, "redis batch account 6 balance")
 	}
 }
 
@@ -730,7 +731,7 @@ func BenchmarkBasicBatchPostgres(b *testing.B) {
 		}
 		rows.Close()
 
-		assert(bal1, -postgresTotalTransferredBatch, "postgres batch account 5 balance")
-		assert(bal2, postgresTotalTransferredBatch, "postgres batch account 6 balance")
+		assert(b, bal1, -postgresTotalTransferredBatch, "postgres batch account 5 balance")
+		assert(b, bal2, postgresTotalTransferredBatch, "postgres batch account 6 balance")
 	}
 }
